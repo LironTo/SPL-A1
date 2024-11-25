@@ -28,7 +28,6 @@ const int Plan::getlifeQualityScore() const {
 const int Plan::getEconomyScore() const {
     return economy_score;
 }
-
 const int Plan::getEnvironmentScore() const {
     return environment_score;
 }
@@ -36,11 +35,18 @@ const int Plan::getEnvironmentScore() const {
 void Plan::setSelectionPolicy(SelectionPolicy *_selectionPolicy) {
     selectionPolicy= _selectionPolicy;
 }
- void Plan::step(){
-    if(status==PlanStatus::BUSY){
-        
+void Plan::step() {
+    if (status == PlanStatus::BUSY) {
+        for (auto it = underConstruction.begin(); it != underConstruction.end(); ) {
+            Facility* facility = *it;
+            // Step the facility and check its new status
+            FacilityStatus facilityStatus = facility->step();
+            
+
     }
- }
+}
+
+ 
 
 
 
