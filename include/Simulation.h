@@ -14,8 +14,10 @@ class SelectionPolicy;
 class Simulation {
     public:
         Simulation(const string &configFilePath);
+        Simulation(const Simulation &other);
         void start();
         void addPlan(const Settlement *settlement, SelectionPolicy *selectionPolicy);
+        bool addPlanHelper(vector<string>* lineargs);
         void addAction(BaseAction *action);
         bool addSettlement(Settlement *settlement);
         bool addFacility(FacilityType facility);
@@ -26,6 +28,7 @@ class Simulation {
         void step();
         void close();
         void open();
+        void printActionsLog();
 
     private:
         bool isRunning;
@@ -34,5 +37,4 @@ class Simulation {
         vector<Plan> plans;
         vector<Settlement*> settlements;
         vector<FacilityType> facilitiesOptions;
-        std::fstream* configFile;
 };
