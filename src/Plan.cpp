@@ -21,6 +21,10 @@ Plan::Plan(const int planId,
         throw std::invalid_argument("SelectionPolicy cannot be null");
     }
 }
+~Plan(){
+    delete plan_id;
+    delete Settlement;
+}
 const int Plan::getlifeQualityScore() const {
     return life_quality_score;
 }
@@ -41,7 +45,11 @@ void Plan::step() {
             Facility* facility = *it;
             // Step the facility and check its new status
             FacilityStatus facilityStatus = facility->step();
-            
+            if(facilityStatus==FacilityStatus::OPERATIONAL){
+                facilities.push_back(facility);
+            }
+            selectionPolicy.
+
 
     }
 }
