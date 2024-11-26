@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../include/Facility.h"
+#include <string>
 
 Facility::Facility(const FacilityType &type, const string &settlementName)
     : FacilityType(type), 
@@ -41,10 +42,13 @@ FacilityStatus Facility::step(){
 void Facility::setStatus(FacilityStatus status_) {
     status = status_;
 }
-const string Facility::toString() const{
-    string s1="settlement name=";
-    return s1;
+const string Facility::toString() const {
+    string s = "FacilityName: " + name; // Assuming `name` is a member of FacilityType
+    s += ", Status: " + (status == FacilityStatus::UNDER_CONSTRUCTIONS ? "UNDER_CONSTRUCTIONS" : "OPERATIONAL");
+    s += ", Time Left: " + std::to_string(timeLeft);
+    return s;
 }
+
 
 
 
