@@ -74,11 +74,11 @@ void Plan::printStatus() {
     // Print Plan ID
     std::cout << "PlanID: " << plan_id << std::endl;
 
-    // Print Settlement Name
+    // Print Settlement information
     if (settlement) {
-        std::cout << "SettlementName: " << settlement->getName() << std::endl;
+        std::cout << settlement->toString() << std::endl;
     } else {
-        std::cout << "SettlementName: N/A" << std::endl;
+        std::cout << "Settlement: N/A" << std::endl;
     }
 
     // Print Plan Status
@@ -109,26 +109,3 @@ void Plan::printStatus() {
         std::cout << facility->toString() << std::endl;
     }
 }
-
-void Plan::decreaseConstructionTime() {
-    for (auto it = underConstruction.begin(); it != underConstruction.end(); ) {
-        Facility* facility = *it;
-        // Call Facility::step() to progress constructionnn
-        FacilityStatus status = facility->step();
-        // If the facility is now operational, move it to the facilities list
-        if (status == FacilityStatus::OPERATIONAL) {
-            facilities.push_back(facility);     // Add to operational facilities
-            it = underConstruction.erase(it);  // Remove from underConstruction
-        } else {
-            ++it; // Move to the next facility
-        }
-    }
-}
-
-const std::vector<Facility*>& Plan::getFacilities() const {
-    int i=1;
-    return facilities; // Return a reference to the vector
-}
-
-
-
