@@ -18,7 +18,7 @@ class Plan {
         const int getEnvironmentScore() const;
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();
-        ~Plan();
+        //~Plan();
         void printStatus();
         void decreaseConstructionTime();
         const vector<Facility*> &getFacilities() const;
