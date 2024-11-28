@@ -27,11 +27,13 @@ bin/Simulation.o: src/Simulation.cpp
 bin/main.o: src/main.cpp
 	g++ -g -c -Wall -Weffc++ -std=c++11 -Iinclude -o bin/main.o src/main.cpp
 
-Link: bin/Action.o bin/Auxiliary.o bin/Facility.o bin/Plan.o bin/SelectionPolicy.o bin/Settlement.o bin/Simulation.o bin/main.o
+Link: compile
 	g++ -g -o bin/main bin/Action.o bin/Auxiliary.o bin/Facility.o bin/Plan.o bin/SelectionPolicy.o bin/Settlement.o bin/Simulation.o bin/main.o
 
 Run: bin/main
 	./bin/main
+
+all: link
 
 clean:
 	rm -rf bin/*
