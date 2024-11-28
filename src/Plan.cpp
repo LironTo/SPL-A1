@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../include/Plan.h"
+#include <sstream>
 
 Plan::Plan(const int planId, 
            const Settlement &settlement, 
@@ -111,9 +112,21 @@ Plan::Plan(Plan&& other) noexcept
 }
 
 
-Plan& Plan::operator=(Plan&& other) noexcept{
-    
-
+Plan& Plan::operator=(Plan&& other) noexcept {
+    if (this != &other) {
+        Clear(); // Clean up current object's resources
+        facilities = std::move(other.facilities);
+        underConstruction = std::move(other.underConstruction);
+        //facilityOptions = other.facilityOptions; 
+        plan_id = other.plan_id;
+        selectionPolicy = other.selectionPolicy;
+        settlement = other.settlement;
+        status = other.status;
+        life_quality_score = other.life_quality_score;
+        economy_score = other.economy_score;
+        environment_score = other.environment_score;
+    }
+    return *this;
 }
 
 
@@ -168,42 +181,27 @@ void Plan::step() {
     }
 }
 
-void Plan::printStatus() {
-    // Print Plan ID
-    std::cout << "PlanID: " << plan_id << std::endl;
-
-    // Print Settlement information
-    if (settlement) {
-        std::cout << settlement->toString() << std::endl;
-    } else {
-        std::cout << "Settlement: N/A" << std::endl;
-    }
-
-    // Print Plan Status
-    std::cout << "PlanStatus: " 
-              << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") 
-              << std::endl;
-
-    // Print Selection Policy
-    if (selectionPolicy) {
-        std::cout << "SelectionPolicy: " << selectionPolicy->toString() << std::endl;
-    } else {
-        std::cout << "SelectionPolicy: N/A" << std::endl;
-    }
-
-    // Print Scores
-    std::cout << "LifeQualityScore: " << life_quality_score << std::endl;
-    std::cout << "EconomyScore: " << economy_score << std::endl;
-    std::cout << "EnvironmentScore: " << environment_score << std::endl;
-
-    // Print Facilities in the Plan
-    std::cout << "----- Facilities in Construction -----" << std::endl;
+const std::string Plan::toString() const {
+    std::ostringstream oss;
+    oss << "PlanID: " << plan_id << "\n"
+        << "Settlement Name: " << (settlement ? settlement->toString() : "N/A") << "\n"
+        << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << "\n"
+        << "SelectionPolicy: " << (selectionPolicy ? selectionPolicy->toString() : "N/A") << "\n"
+        << "LifeQualityScore: " << life_quality_score << "\n"
+        << "EconomyScore: " << economy_score << "\n"
+        << "EnvironmentScore: " << environment_score << "\n"
+        << "----- Facilities in Construction -----\n";
     for (const Facility* facility : underConstruction) {
-        std::cout << facility->toString() << std::endl;
+        oss << facility->toString() << "\n";
     }
-
-    std::cout << "----- Completed Facilities -----" << std::endl;
+    oss << "----- Completed Facilities -----\n";
     for (const Facility* facility : facilities) {
-        std::cout << facility->toString() << std::endl;
+        oss << facility->toString() << "\n";
     }
+    return oss.str();
 }
+
+void Plan::printStatus() {
+    std::cout << toString();
+}
+
