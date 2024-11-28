@@ -55,45 +55,51 @@ void Plan::Clear(){
         delete settlement;
     }
 }
-Plan& Plan::operator=(const Plan& other) {
+Plan& Plan::operator=(const Plan& other) noexcept {
     // Self-assignment check
     if (this == &other) {
         return *this;
     }
-    // Clean up existing resources
     Clear();
     plan_id = other.plan_id;
     status = other.status;
     life_quality_score = other.life_quality_score;
     economy_score = other.economy_score;
     environment_score = other.environment_score;
+
+    // Deep copy facilities
     for (Facility* facility : other.facilities) {
         facilities.push_back(new Facility(*facility));
     }
     for (Facility* facility : other.underConstruction) {
         underConstruction.push_back(new Facility(*facility));
     }
+
+    // Deep copy selection policy
     if (other.selectionPolicy) {
-        selectionPolicy = other.selectionPolicy->clone(); // Assuming clone() exists
+        selectionPolicy = other.selectionPolicy->clone();
     } else {
         selectionPolicy = nullptr;
     }
-    settlement = other.settlement; // Shallow copy unless Plan owns it
+
+    // Copy settlement (shallow copy or deep copy based on ownership)
+    settlement = other.settlement;
 
     return *this; // Return the updated object
 }
-Plan::Plan()
-    : plan_id(0),
-      settlement(nullptr),
-      selectionPolicy(nullptr), 
-      status(PlanStatus::AVALIABLE),
-      facilities(), 
-      underConstruction(), 
-      facilityOptions(vector<FacilityType>()), 
-      life_quality_score(0),
-      economy_score(0),
-      environment_score(0) {
-}
+
+// Plan::Plan()
+//     : plan_id(0),
+//       settlement(nullptr),
+//       selectionPolicy(nullptr), 
+//       status(PlanStatus::AVALIABLE),
+//       facilities(), 
+//       underConstruction(), 
+//       facilityOptions( const vector<FacilityType>()), 
+//       life_quality_score(0),
+//       economy_score(0),
+//       environment_score(0) {
+// }
 
 Plan::Plan(Plan&& other) noexcept
     : facilities(std::move(other.facilities)),               
@@ -112,22 +118,22 @@ Plan::Plan(Plan&& other) noexcept
 }
 
 
-Plan& Plan::operator=(Plan&& other) noexcept {
-    if (this != &other) {
-        Clear(); // Clean up current object's resources
-        facilities = std::move(other.facilities);
-        underConstruction = std::move(other.underConstruction);
-        //facilityOptions = other.facilityOptions; 
-        plan_id = other.plan_id;
-        selectionPolicy = other.selectionPolicy;
-        settlement = other.settlement;
-        status = other.status;
-        life_quality_score = other.life_quality_score;
-        economy_score = other.economy_score;
-        environment_score = other.environment_score;
-    }
-    return *this;
-}
+// Plan& Plan::operator=(Plan&& other) noexcept {
+//     if (this != &other) {
+//         Clear(); // Clean up current object's resources
+//         facilities = std::move(other.facilities);
+//         underConstruction = std::move(other.underConstruction);
+//         //facilityOptions = other.facilityOptions; 
+//         plan_id = other.plan_id;
+//         selectionPolicy = other.selectionPolicy;
+//         settlement = other.settlement;
+//         status = other.status;
+//         life_quality_score = other.life_quality_score;
+//         economy_score = other.economy_score;
+//         environment_score = other.environment_score;
+//     }
+//     return *this;
+// }
 
 
 
@@ -163,7 +169,6 @@ void Plan::step() {
         // Stage 2: Use the selection policy to choose new facilities
         while (underConstruction.size() < constructionLimit) {
             if (facilityOptions.empty()) {
-                std::cerr << "No facility options available for selection." << std::endl;
                 break; // Prevent infinite loop if no options exist
             }
             const FacilityType& selectedType = selectionPolicy->selectFacility(facilityOptions);
