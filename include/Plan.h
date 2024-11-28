@@ -13,12 +13,18 @@ enum class PlanStatus {
 class Plan {
     public:
         Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
+        Plan(const Plan& plan);
+        Plan& operator=(const Plan&) = delete; 
+        Plan& operator=(Plan&&) = delete;      
+        Plan(Plan&& other) noexcept;
+        Plan();
+        void Clear();
         const int getlifeQualityScore() const;
         const int getEconomyScore() const;
         const int getEnvironmentScore() const;
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();
-        //~Plan();
+        ~Plan();
         void printStatus();
         void decreaseConstructionTime();
         const vector<Facility*> &getFacilities() const;
