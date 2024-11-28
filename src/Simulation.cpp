@@ -158,14 +158,15 @@ Simulation::Simulation(const Simulation &other) : isRunning(other.isRunning), pl
     for(FacilityType facility: other.facilitiesOptions) {facilitiesOptions.push_back(FacilityType(facility));}
 }
 
-Simulation &Simulation::operator=(const Simulation &other){
+
+Simulation &Simulation::operator=(const Simulation &other){  
     if(this != &other){
         isRunning = other.isRunning;
         planCounter = other.planCounter;
         actionsLog = other.actionsLog;
-        plans = other.plans;
+     //   plans = other.plans;
         settlements = other.settlements;
-        facilitiesOptions = other.facilitiesOptions;
+       // facilitiesOptions = other.facilitiesOptions;
     }
     return *this;
 }
