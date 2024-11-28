@@ -55,38 +55,38 @@ void Plan::Clear(){
         delete settlement;
     }
 }
-Plan& Plan::operator=(const Plan& other) noexcept {
-    // Self-assignment check
-    if (this == &other) {
-        return *this;
-    }
-    Clear();
-    plan_id = other.plan_id;
-    status = other.status;
-    life_quality_score = other.life_quality_score;
-    economy_score = other.economy_score;
-    environment_score = other.environment_score;
+// Plan& Plan::operator=(const Plan& other) noexcept {
+//     // Self-assignment check
+//     if (this == &other) {
+//         return *this;
+//     }
+//     Clear();
+//     plan_id = other.plan_id;
+//     status = other.status;
+//     life_quality_score = other.life_quality_score;
+//     economy_score = other.economy_score;
+//     environment_score = other.environment_score;
 
-    // Deep copy facilities
-    for (Facility* facility : other.facilities) {
-        facilities.push_back(new Facility(*facility));
-    }
-    for (Facility* facility : other.underConstruction) {
-        underConstruction.push_back(new Facility(*facility));
-    }
+//     // Deep copy facilities
+//     for (Facility* facility : other.facilities) {
+//         facilities.push_back(new Facility(*facility));
+//     }
+//     for (Facility* facility : other.underConstruction) {
+//         underConstruction.push_back(new Facility(*facility));
+//     }
 
-    // Deep copy selection policy
-    if (other.selectionPolicy) {
-        selectionPolicy = other.selectionPolicy->clone();
-    } else {
-        selectionPolicy = nullptr;
-    }
+//     // Deep copy selection policy
+//     if (other.selectionPolicy) {
+//         selectionPolicy = other.selectionPolicy->clone();
+//     } else {
+//         selectionPolicy = nullptr;
+//     }
 
-    // Copy settlement (shallow copy or deep copy based on ownership)
-    settlement = other.settlement;
+//     // Copy settlement (shallow copy or deep copy based on ownership)
+//     settlement = other.settlement;
 
-    return *this; // Return the updated object
-}
+//     return *this; // Return the updated object
+// }
 
 // Plan::Plan()
 //     : plan_id(0),
