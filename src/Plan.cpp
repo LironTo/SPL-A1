@@ -22,6 +22,104 @@ Plan::Plan(const int planId,
     }
 }
 
+//rule of 5
+Plan::~Plan() {
+    Clear();
+}
+
+Plan::Plan(const Plan& other): plan_id(other.plan_id), 
+      settlement(other.settlement), 
+      selectionPolicy(other.selectionPolicy), 
+      facilityOptions(other.facilityOptions), 
+      status(PlanStatus::AVALIABLE), 
+      facilities(), 
+      underConstruction(), 
+      life_quality_score(0), 
+      economy_score(0), 
+      environment_score(0) {};
+
+void Plan::Clear(){
+    for (Facility* facility : facilities) {
+        delete facility;
+    }
+    facilities.clear();
+    for (Facility* facility : underConstruction) {
+        delete facility;
+    }
+    underConstruction.clear();
+    if (selectionPolicy) {
+        delete selectionPolicy;
+    }
+    if (settlement) {
+        delete settlement;
+    }
+}
+Plan& Plan::operator=(const Plan& other) {
+    // Self-assignment check
+    if (this == &other) {
+        return *this;
+    }
+    // Clean up existing resources
+    Clear();
+    plan_id = other.plan_id;
+    status = other.status;
+    life_quality_score = other.life_quality_score;
+    economy_score = other.economy_score;
+    environment_score = other.environment_score;
+    for (Facility* facility : other.facilities) {
+        facilities.push_back(new Facility(*facility));
+    }
+    for (Facility* facility : other.underConstruction) {
+        underConstruction.push_back(new Facility(*facility));
+    }
+    if (other.selectionPolicy) {
+        selectionPolicy = other.selectionPolicy->clone(); // Assuming clone() exists
+    } else {
+        selectionPolicy = nullptr;
+    }
+    settlement = other.settlement; // Shallow copy unless Plan owns it
+
+    return *this; // Return the updated object
+}
+Plan::Plan()
+    : plan_id(0),
+      settlement(nullptr),
+      selectionPolicy(nullptr), 
+      status(PlanStatus::AVALIABLE),
+      facilities(), 
+      underConstruction(), 
+      facilityOptions(vector<FacilityType>()), 
+      life_quality_score(0),
+      economy_score(0),
+      environment_score(0) {
+}
+
+Plan::Plan(Plan&& other) noexcept
+    : facilities(std::move(other.facilities)),               
+      underConstruction(std::move(other.underConstruction)),   
+      facilityOptions(other.facilityOptions),                  
+      plan_id(other.plan_id),                                 
+      settlement(other.settlement),                            
+      selectionPolicy(other.selectionPolicy),                 
+      status(other.status),                                    
+      life_quality_score(other.life_quality_score),            
+      economy_score(other.economy_score),                    
+      environment_score(other.environment_score)          
+{
+    other.selectionPolicy = nullptr;
+    other.settlement = nullptr;
+}
+
+
+Plan& Plan::operator=(Plan&& other) noexcept{
+    
+
+}
+
+
+
+
+
 const int Plan::getlifeQualityScore() const {
     return life_quality_score;
 }
