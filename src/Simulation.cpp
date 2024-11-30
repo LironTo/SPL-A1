@@ -53,6 +53,8 @@ void Simulation::start() {
             action->act(*this);
             addAction(action);
         }
+        
+        delete action;
     }
 }
 

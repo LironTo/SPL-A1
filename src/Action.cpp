@@ -7,7 +7,7 @@ extern Simulation* backup;
 
 BaseAction::BaseAction() {}
 
-BaseAction::BaseAction(const BaseAction &other) : status(other.status), errorMsg(other.errorMsg) {}
+BaseAction::BaseAction(const BaseAction &other) : errorMsg(other.errorMsg),  status(other.status){}
 
 ActionStatus BaseAction::getStatus() const {
     return status;
