@@ -1,6 +1,8 @@
 # Please implement your Makefile rules and targets below.
 # Customize this file to define how to build your project.
 
+all: clean Link Run
+
 compile: bin/Action.o bin/Auxiliary.o bin/Facility.o bin/Plan.o bin/SelectionPolicy.o bin/Settlement.o bin/Simulation.o bin/main.o
 
 bin/Action.o: src/Action.cpp
@@ -30,10 +32,8 @@ bin/main.o: src/main.cpp
 Link: compile
 	g++ -g -o bin/main bin/Action.o bin/Auxiliary.o bin/Facility.o bin/Plan.o bin/SelectionPolicy.o bin/Settlement.o bin/Simulation.o bin/main.o
 
-Run: bin/main
-	./bin/main
-
-all: link
+Run: bin/main 
+	./bin/main config_file.txt
 
 clean:
 	rm -rf bin/*
