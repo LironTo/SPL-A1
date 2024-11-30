@@ -185,6 +185,19 @@ void Plan::step() {
         status = PlanStatus::AVALIABLE; // Some slots are now free
     }
 }
+void Plan::decreaseConstructionTime() {
+    for (auto it = underConstruction.begin(); it != underConstruction.end(); ) {
+        Facility* facility = *it;
+        FacilityStatus status = facility->step();
+        if (status == FacilityStatus::OPERATIONAL) {
+            facilities.push_back(facility);
+            it = underConstruction.erase(it);
+        } else {
+            ++it; 
+        }
+    }
+}
+
 
 const std::string Plan::toString() const {
     std::ostringstream oss;
