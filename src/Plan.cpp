@@ -2,20 +2,20 @@
 #include "../include/Plan.h"
 #include <sstream>
 
-Plan::Plan(const int planId, 
+Plan::Plan(int planId, 
            const Settlement &settlement, 
            SelectionPolicy *selectionPolicy, 
-           const vector<FacilityType> &facilityOptions) 
+           const std::vector<FacilityType> &facilityOptions) 
     : plan_id(planId), 
       settlement(&settlement), 
-      selectionPolicy(selectionPolicy), 
-      facilityOptions(facilityOptions), 
+      selectionPolicy(selectionPolicy),
       status(PlanStatus::AVALIABLE), 
       facilities(), 
       underConstruction(), 
+      facilityOptions(facilityOptions),
       life_quality_score(0), 
       economy_score(0), 
-      environment_score(0) 
+      environment_score(0)
 {
     // Additional validation or logic can go here, if needed
     if (!selectionPolicy) {
@@ -31,10 +31,10 @@ Plan::~Plan() {
 Plan::Plan(const Plan& other): plan_id(other.plan_id), 
       settlement(other.settlement), 
       selectionPolicy(other.selectionPolicy), 
-      facilityOptions(other.facilityOptions), 
-      status(PlanStatus::AVALIABLE), 
+      status(PlanStatus::AVALIABLE),
       facilities(), 
       underConstruction(), 
+      facilityOptions(other.facilityOptions),  
       life_quality_score(0), 
       economy_score(0), 
       environment_score(0) {};
@@ -102,13 +102,13 @@ void Plan::Clear(){
 // }
 
 Plan::Plan(Plan&& other) noexcept
-    : facilities(std::move(other.facilities)),               
+    : plan_id(other.plan_id), 
+      settlement(other.settlement),
+      selectionPolicy(other.selectionPolicy),
+      status(other.status), 
+      facilities(std::move(other.facilities)),               
       underConstruction(std::move(other.underConstruction)),   
-      facilityOptions(other.facilityOptions),                  
-      plan_id(other.plan_id),                                 
-      settlement(other.settlement),                            
-      selectionPolicy(other.selectionPolicy),                 
-      status(other.status),                                    
+      facilityOptions(other.facilityOptions),                                                                                                                               
       life_quality_score(other.life_quality_score),            
       economy_score(other.economy_score),                    
       environment_score(other.environment_score)          
@@ -167,7 +167,7 @@ void Plan::step() {
     // Stage 1: Check PlanSta
     if (status == PlanStatus::AVALIABLE) {
         // Stage 2: Use the selection policy to choose new facilities
-        while (underConstruction.size() < constructionLimit) {
+        while (underConstruction.size() < static_cast<std::vector<Facility*>::size_type>(constructionLimit)) {
             if (facilityOptions.empty()) {
                 break; // Prevent infinite loop if no options exist
             }
@@ -179,7 +179,7 @@ void Plan::step() {
     // Stage 3: Progress construction
     decreaseConstructionTime();
     // Stage 4: Update PlanStatus
-    if (underConstruction.size() == constructionLimit) {
+    if (underConstruction.size() == static_cast<std::vector<Facility*>::size_type>(constructionLimit)) {
         status = PlanStatus::BUSY; // All slots are still occupied
     } else {
         status = PlanStatus::AVALIABLE; // Some slots are now free
