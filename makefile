@@ -1,7 +1,7 @@
 # Please implement your Makefile rules and targets below.
 # Customize this file to define how to build your project.
 
-all: clean Link Run
+all: clean Link Leaks Run 
 
 compile: bin/Action.o bin/Auxiliary.o bin/Facility.o bin/Plan.o bin/SelectionPolicy.o bin/Settlement.o bin/Simulation.o bin/main.o
 
@@ -38,3 +38,5 @@ Run: bin/main
 clean:
 	rm -rf bin/*
 
+Leaks:
+	valgrind --leak-check=full --show-reachable=yes bin/main config_file.txt 
