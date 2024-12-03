@@ -39,22 +39,25 @@ Plan::Plan(const Plan& other): plan_id(other.plan_id),
       economy_score(0), 
       environment_score(0) {};
 
-void Plan::Clear(){
+void Plan::Clear() {
     for (Facility* facility : facilities) {
         delete facility;
     }
     facilities.clear();
+
     for (Facility* facility : underConstruction) {
         delete facility;
     }
     underConstruction.clear();
+
     if (selectionPolicy) {
         delete selectionPolicy;
+        selectionPolicy = nullptr;
     }
-    if (settlement) {
-        delete settlement;
-    }
+
+    // Do not delete settlement or assign nullptr
 }
+
 // Plan& Plan::operator=(const Plan& other) noexcept {
 //     // Self-assignment check
 //     if (this == &other) {
@@ -102,20 +105,20 @@ void Plan::Clear(){
 // }
 
 Plan::Plan(Plan&& other) noexcept
-    : plan_id(other.plan_id), 
-      settlement(other.settlement),
+    : plan_id(other.plan_id),
+      settlement(other.settlement), // Keep reference intact
       selectionPolicy(other.selectionPolicy),
-      status(other.status), 
-      facilities(std::move(other.facilities)),               
-      underConstruction(std::move(other.underConstruction)),   
-      facilityOptions(other.facilityOptions),                                                                                                                               
-      life_quality_score(other.life_quality_score),            
-      economy_score(other.economy_score),                    
-      environment_score(other.environment_score)          
+      status(other.status),
+      facilities(std::move(other.facilities)),
+      underConstruction(std::move(other.underConstruction)),
+      facilityOptions(other.facilityOptions),
+      life_quality_score(other.life_quality_score),
+      economy_score(other.economy_score),
+      environment_score(other.environment_score)
 {
-    other.selectionPolicy = nullptr;
-    other.settlement = nullptr;
+    other.selectionPolicy = nullptr; // Reset dynamically allocated member
 }
+
 
 
 // Plan& Plan::operator=(Plan&& other) noexcept {
@@ -163,8 +166,9 @@ int getConstructionLimit(SettlementType type) {
 }
 void Plan::step() {
     // Calculate the construction limit once
-    int constructionLimit = getConstructionLimit(settlement->getType());
-    // Stage 1: Check PlanSta
+    int constructionLimit = getConstructionLimit(settlement.getType());
+
+    // Stage 1: Check PlanStatus
     if (status == PlanStatus::AVALIABLE) {
         // Stage 2: Use the selection policy to choose new facilities
         while (underConstruction.size() < static_cast<std::vector<Facility*>::size_type>(constructionLimit)) {
@@ -172,12 +176,14 @@ void Plan::step() {
                 break; // Prevent infinite loop if no options exist
             }
             const FacilityType& selectedType = selectionPolicy->selectFacility(facilityOptions);
-            Facility* newFacility = new Facility(selectedType, settlement->getName());
+            Facility* newFacility = new Facility(selectedType, settlement.getName());
             underConstruction.push_back(newFacility);
         }
     }
+
     // Stage 3: Progress construction
     decreaseConstructionTime();
+
     // Stage 4: Update PlanStatus
     if (underConstruction.size() == static_cast<std::vector<Facility*>::size_type>(constructionLimit)) {
         status = PlanStatus::BUSY; // All slots are still occupied
@@ -185,6 +191,7 @@ void Plan::step() {
         status = PlanStatus::AVALIABLE; // Some slots are now free
     }
 }
+
 void Plan::decreaseConstructionTime() {
     for (auto it = underConstruction.begin(); it != underConstruction.end(); ) {
         Facility* facility = *it;
@@ -193,16 +200,15 @@ void Plan::decreaseConstructionTime() {
             facilities.push_back(facility);
             it = underConstruction.erase(it);
         } else {
-            ++it; 
+            ++it;
         }
     }
 }
 
-
 const std::string Plan::toString() const {
     std::ostringstream oss;
     oss << "PlanID: " << plan_id << "\n"
-        << "Settlement Name: " << (settlement ? settlement->toString() : "N/A") << "\n"
+        << "Settlement Name: " << settlement.toString() << "\n"
         << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << "\n"
         << "SelectionPolicy: " << (selectionPolicy ? selectionPolicy->toString() : "N/A") << "\n"
         << "LifeQualityScore: " << life_quality_score << "\n"
@@ -222,4 +228,3 @@ const std::string Plan::toString() const {
 void Plan::printStatus() {
     std::cout << toString();
 }
-

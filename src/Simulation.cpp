@@ -34,9 +34,11 @@ void Simulation::start() {
     cout << "The simulation has started" << endl;
     while(isRunning){
         string command;
-        cin >> command;
+        getline(cin,command);
         vector<string> lineargs = Auxiliary::parseArguments(command);
-
+        for (const auto& arg : lineargs) {
+            std::cout << arg << std::endl;
+}
         BaseAction* action = nullptr;
         if(lineargs[0] == "step") { action = new SimulateStep(stoi(lineargs[1])); }
         else if(lineargs[0] == "plan") { action = new AddPlan(lineargs[1], lineargs[2]); }
@@ -48,6 +50,7 @@ void Simulation::start() {
         else if(lineargs[0] == "close") { action = new Close(); }
         else if(lineargs[0] == "backup") { action = new BackupSimulation(); }
         else if(lineargs[0] == "restore") { action = new RestoreSimulation(); }
+        else { cout << "Invalid command" << endl; }
 
         if(action != nullptr){
             action->act(*this);
