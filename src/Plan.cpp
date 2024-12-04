@@ -206,23 +206,37 @@ void Plan::decreaseConstructionTime() {
 }
 
 const std::string Plan::toString() const {
-    std::ostringstream oss;
-    oss << "PlanID: " << plan_id << "\n"
-        << "SettlementName: " << settlement.getName() << "\n"
-        << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << "\n"
-        << "SelectionPolicy: " << (selectionPolicy->toString()) << "\n"
-        << "LifeQualityScore: " << life_quality_score << "\n"
-        << "EconomyScore: " << economy_score << "\n"
-        << "EnvironmentScore: " << environment_score << "\n"
-        << "----- Facilities in Construction -----\n";
-    for (const Facility* facility : underConstruction) {
-        oss << facility->toString() << "\n";
+    std::string result;
+    result += "PlanID: " + std::to_string(plan_id) + "\n";
+    result += "SettlementName: " + settlement.getName() + "\n";
+    result += "PlanStatus: " + std::string(status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") + "\n";
+
+    // Check if selectionPolicy is not null before dereferencing
+    if (selectionPolicy) {
+        result += "SelectionPolicy: " + selectionPolicy->toString() + "\n";
+    } else {
+        result += "SelectionPolicy: null\n";
     }
-    oss << "----- Completed Facilities -----\n";
-    for (const Facility* facility : facilities) {
-        oss << facility->toString() << "\n";
+
+    result += "LifeQualityScore: " + std::to_string(life_quality_score) + "\n";
+    result += "EconomyScore: " + std::to_string(economy_score) + "\n";
+    result += "EnvironmentScore: " + std::to_string(environment_score) + "\n";
+    result += "----- Facilities in Construction -----\n";
+
+    // Check if underConstruction is not empty before iterating
+    if(!underConstruction.empty()) {
+        for (const Facility* facility : underConstruction) {
+            if (facility) {
+                result += facility->toString() + "\n";
+            } else {
+                result += "null facility\n";
+            }
+        }
+    } else {
+        result += "No facilities under construction\n";
     }
-    return oss.str();
+
+    return result;
 }
 
 void Plan::printStatus() {
