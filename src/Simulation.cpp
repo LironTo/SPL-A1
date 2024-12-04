@@ -34,9 +34,11 @@ void Simulation::start() {
     cout << "The simulation has started" << endl;
     while(isRunning){
         string command;
-        cin >> command;
+        getline(cin,command);
         vector<string> lineargs = Auxiliary::parseArguments(command);
-
+        for (const auto& arg : lineargs) {
+            std::cout << arg << std::endl;
+}
         BaseAction* action = nullptr;
         if(lineargs[0] == "step") { action = new SimulateStep(stoi(lineargs[1])); }
         else if(lineargs[0] == "plan") { action = new AddPlan(lineargs[1], lineargs[2]); }
@@ -48,28 +50,28 @@ void Simulation::start() {
         else if(lineargs[0] == "close") { action = new Close(); }
         else if(lineargs[0] == "backup") { action = new BackupSimulation(); }
         else if(lineargs[0] == "restore") { action = new RestoreSimulation(); }
+        else { cout << "Invalid command" << endl; }
 
         if(action != nullptr){
             action->act(*this);
             addAction(action);
         }
         
-        delete action;
     }
 }
 
-void Simulation::addPlan(const Settlement *settlement, SelectionPolicy *selectionPolicy) {
-    plans.push_back(Plan(planCounter, *settlement, selectionPolicy, facilitiesOptions));
+void Simulation::addPlan(const Settlement& settlement, SelectionPolicy *selectionPolicy) {
+    plans.push_back(Plan(planCounter, settlement, selectionPolicy, facilitiesOptions));
     planCounter++;
 }
 
 bool Simulation::addPlanHelper(vector<string>* lineargs) {
     if(lineargs->size() != 3) { return false; }
     if(!isSettlementExists(lineargs->at(1))) { return false; }
-    if(lineargs->at(2) == "nve") { addPlan(getSettlement(lineargs->at(1)), new NaiveSelection()); }
-    else if(lineargs->at(2) == "bal") { addPlan(getSettlement(lineargs->at(1)), new BalancedSelection(0,0,0)); }
-    else if(lineargs->at(2) == "eco") { addPlan(getSettlement(lineargs->at(1)), new EconomySelection()); }
-    else if(lineargs->at(2) == "env") { addPlan(getSettlement(lineargs->at(1)), new SustainabilitySelection()); }
+    if(lineargs->at(2) == "nve") { addPlan(*getSettlement(lineargs->at(1)), new NaiveSelection()); }
+    else if(lineargs->at(2) == "bal") { addPlan(*getSettlement(lineargs->at(1)), new BalancedSelection(0,0,0)); }
+    else if(lineargs->at(2) == "eco") { addPlan(*getSettlement(lineargs->at(1)), new EconomySelection()); }
+    else if(lineargs->at(2) == "env") { addPlan(*getSettlement(lineargs->at(1)), new SustainabilitySelection()); }
     else { return false; }
     return true;
 }
