@@ -32,6 +32,24 @@ const string& FacilityType::getName() const {
     return name;
 }
 
+const string FacilityType::toString() const {
+    string category_str = "NONE";
+    if (category == FacilityCategory::LIFE_QUALITY) {
+        category_str = "LIFE_QUALITY";
+    } else if (category == FacilityCategory::ECONOMY) {
+        category_str = "ECONOMY";
+    } else {
+        category_str = "ENVIRONMENT";
+    }
+    string s = "FacilityName: " + name;
+    s += ", Category: " + category_str;
+    s += ", Price: " + std::to_string(price);
+    s += ", LifeQualityScore: " + std::to_string(lifeQuality_score);
+    s += ", EconomyScore: " + std::to_string(economy_score);
+    s += ", EnvironmentScore: " + std::to_string(environment_score);
+    return s;
+}
+
 /*------------------------------Facility----------------------------*/
 
 Facility::Facility(const FacilityType &type, const string &settlementName)

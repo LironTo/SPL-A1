@@ -13,13 +13,16 @@ ActionStatus BaseAction::getStatus() const {
     return status;
 }
 
-const string &BaseAction::statusStr() const {
+void BaseAction::statusStr(string& str) const {
     if (status == ActionStatus::COMPLETED) {
-        return " COMPLETED";
-    } else if (status == ActionStatus::ERROR) {
-        return " ERROR";
+        str = "COMPLETED";
+    } 
+    else if (status == ActionStatus::ERROR) {
+        str = "ERROR";
     }
-    return "";
+    else {
+        str = "";
+    }
 }
 
 void BaseAction::complete() {
@@ -36,6 +39,8 @@ const string &BaseAction::getErrorMsg() const {
     return errorMsg;
 }
 
+BaseAction::BaseAction(BaseAction &&other) : errorMsg(other.errorMsg), status(other.status) {}
+
 /*-------------------------SimulateStep------------------------*/
 
 SimulateStep::SimulateStep(const int numOfSteps) : numOfSteps(numOfSteps) {}
@@ -48,7 +53,9 @@ void SimulateStep::act(Simulation &simulation) {
 }
 
 const string SimulateStep::toString() const {
-    return "step " + std::to_string(numOfSteps) + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "step " + std::to_string(numOfSteps) + " " + str;
 }
 
 SimulateStep *SimulateStep::clone() const {
@@ -57,14 +64,7 @@ SimulateStep *SimulateStep::clone() const {
 
 SimulateStep::SimulateStep(const SimulateStep &other) : BaseAction(other) ,numOfSteps(other.numOfSteps) {}
 
-/*SimulateStep &SimulateStep::operator=(const SimulateStep &other) {
-    if (this != &other) {
-        status = other.getStatus();
-        errorMsg = other.getErrorMsg();
-        numOfSteps = other.numOfSteps;
-    }
-    return *this;
-}*/
+SimulateStep::SimulateStep(SimulateStep &&other) : BaseAction(other), numOfSteps(other.numOfSteps) {}
 
 /*-------------------------AddPlan------------------------*/
 
@@ -77,7 +77,7 @@ void AddPlan::act(Simulation &simulation) {
     argus.push_back(settlementName);
     argus.push_back(selectionPolicy);
     try{
-        if(!simulation.addPlanHelper(&argus)){
+        if(!simulation.addPlanHelper(argus)){
             error("Cannot create this plan");
             return;
         }
@@ -90,7 +90,9 @@ void AddPlan::act(Simulation &simulation) {
 }
 
 const string AddPlan::toString() const {
-    return "plan " + settlementName + " " + selectionPolicy + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "plan " + settlementName + " " + selectionPolicy + " " + str;
 }
 
 AddPlan *AddPlan::clone() const {
@@ -127,10 +129,14 @@ const string AddSettlement::toString() const {
     if(settlementType == SettlementType::VILLAGE) { type = 0; }
     else if(settlementType == SettlementType::CITY) { type = 1; }
     else { type = 2; }
-    return "settlement " + settlementName + " " + std::to_string(type) + " " + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "settlement " + settlementName + " " + std::to_string(type) + " " + str;
 }
 
 AddSettlement::AddSettlement(const AddSettlement &other) : BaseAction(other) ,settlementName(other.settlementName), settlementType(other.settlementType) {}
+
+AddSettlement::AddSettlement(AddSettlement &&other) : BaseAction(other), settlementName(other.settlementName), settlementType(other.settlementType) {}
 
 /*-------------------------AddFacility------------------------*/
 
@@ -164,7 +170,10 @@ const string AddFacility::toString() const {
     if(facilityCategory == FacilityCategory::LIFE_QUALITY) { type = 0; }
     else if(facilityCategory == FacilityCategory::ECONOMY) { type = 1; }
     else { type = 2; }
-    return "facility " + facilityName + " " + std::to_string(type) + " " + std::to_string(price) + " " + std::to_string(lifeQualityScore) + " " + std::to_string(economyScore) + " " + std::to_string(environmentScore) + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "facility " + facilityName + " " + std::to_string(type) + " " + std::to_string(price) + " " +
+             std::to_string(lifeQualityScore) + " " + std::to_string(economyScore) + " " + std::to_string(environmentScore) + " " + str;
 }
 
 AddFacility::AddFacility(const AddFacility &other) : BaseAction(other) ,facilityName(other.facilityName),
@@ -173,6 +182,13 @@ AddFacility::AddFacility(const AddFacility &other) : BaseAction(other) ,facility
                                                      lifeQualityScore(other.lifeQualityScore),
                                                      economyScore(other.economyScore),
                                                      environmentScore(other.environmentScore) {}
+                                                     
+AddFacility::AddFacility(AddFacility &&other) : BaseAction(other), facilityName(other.facilityName), 
+                                                    facilityCategory(other.facilityCategory), 
+                                                    price(other.price), 
+                                                    lifeQualityScore(other.lifeQualityScore), 
+                                                    economyScore(other.economyScore), 
+                                                    environmentScore(other.environmentScore) {}
 
 /*-------------------------PrintPlanStatus------------------------*/
 
@@ -195,10 +211,14 @@ PrintPlanStatus *PrintPlanStatus::clone() const {
 }
 
 const string PrintPlanStatus::toString() const {
-    return "planStatus " + std::to_string(planId) + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "planStatus " + std::to_string(planId) + " " + str;
 }
 
 PrintPlanStatus::PrintPlanStatus(const PrintPlanStatus &other) : BaseAction(other) ,planId(other.planId) {}
+
+PrintPlanStatus::PrintPlanStatus(PrintPlanStatus &&other) : BaseAction(other), planId(other.planId) {}
 
 /*-------------------------ChangePlanPolicy------------------------*/
 
@@ -230,10 +250,14 @@ ChangePlanPolicy *ChangePlanPolicy::clone() const {
 }
 
 const string ChangePlanPolicy::toString() const {
-    return "changePolicy " + std::to_string(planId) + " " + newPolicy + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "changePolicy " + std::to_string(planId) + " " + newPolicy + " " + str;
 }
 
 ChangePlanPolicy::ChangePlanPolicy(const ChangePlanPolicy &other) : BaseAction(other) ,planId(other.planId), newPolicy(other.newPolicy) {}
+
+ChangePlanPolicy::ChangePlanPolicy(ChangePlanPolicy &&other) : BaseAction(other), planId(other.planId), newPolicy(other.newPolicy) {}
 
 /*-------------------------PrintActionsLog------------------------*/
 
@@ -249,10 +273,14 @@ PrintActionsLog *PrintActionsLog::clone() const {
 }
 
 const string PrintActionsLog::toString() const {
-    return "log" + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "log " + str;
 }
 
 PrintActionsLog::PrintActionsLog(const PrintActionsLog &other) : BaseAction(other) {}
+
+PrintActionsLog::PrintActionsLog(PrintActionsLog &&other) : BaseAction(other) {}
 
 /*-------------------------Close------------------------*/
 
@@ -268,10 +296,14 @@ Close *Close::clone() const {
 }
 
 const string Close::toString() const {
-    return "close" + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "close " + str;
 }
 
 Close::Close(const Close &other) : BaseAction(other) {}
+
+Close::Close(Close &&other) : BaseAction(other) {}
 
 /*-------------------------BackupSimulation------------------------*/
 
@@ -280,7 +312,6 @@ BackupSimulation::BackupSimulation() {}
 void BackupSimulation::act(Simulation &simulation) {
     if(backup!=nullptr){
         delete backup;
-        backup = nullptr;
     }
     backup = new Simulation(simulation);
     complete();
@@ -291,10 +322,14 @@ BackupSimulation *BackupSimulation::clone() const {
 }
 
 const string BackupSimulation::toString() const {
-    return "backup" + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "backup " + str;
 }
 
 BackupSimulation::BackupSimulation(const BackupSimulation &other) : BaseAction(other) {}
+
+BackupSimulation::BackupSimulation(BackupSimulation &&other) : BaseAction(other) {}
 
 /*-------------------------RestoreSimulation------------------------*/
 
@@ -314,7 +349,11 @@ RestoreSimulation *RestoreSimulation::clone() const {
 }
 
 const string RestoreSimulation::toString() const {
-    return "restore" + BaseAction::statusStr();
+    string str;
+    statusStr(str);
+    return "restore " + str;
 }
 
 RestoreSimulation::RestoreSimulation(const RestoreSimulation &other) : BaseAction(other) {}
+
+RestoreSimulation::RestoreSimulation(RestoreSimulation &&other) : BaseAction(other) {}
