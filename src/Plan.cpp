@@ -101,7 +101,7 @@ void Plan::Clear() {
 Plan::Plan(Plan&& other) noexcept
     : plan_id(other.plan_id),
       settlement(other.settlement), // Keep reference intact
-      selectionPolicy(other.selectionPolicy),
+      selectionPolicy(other.selectionPolicy->clone()), // Deep copy 
       status(other.status),
       facilities(std::move(other.facilities)),
       underConstruction(std::move(other.underConstruction)),
@@ -206,12 +206,9 @@ void Plan::decreaseConstructionTime() {
 }
 
 const std::string Plan::toString() const {
-    std::cout << (selectionPolicy != nullptr) << std::endl;
-    std::cout << selectionPolicy->toString() << std::endl;
-
     std::ostringstream oss;
     oss << "PlanID: " << plan_id << "\n"
-        << "Settlement Name: " << settlement.toString() << "\n"
+         << settlement.toString() << "\n"
         << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << "\n"
         << "SelectionPolicy: " << (selectionPolicy->toString()) << "\n"
         << "LifeQualityScore: " << life_quality_score << "\n"
