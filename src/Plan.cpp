@@ -3,25 +3,19 @@
 #include <sstream>
 
 Plan::Plan(int planId, 
-           const Settlement &settlement, 
-           SelectionPolicy *selectionPolicy, 
-           const std::vector<FacilityType> &facilityOptions) 
+           const Settlement &settlement,
+           SelectionPolicy* selectionPolicy, 
+           const std::vector<FacilityType>& facilityOptions)
     : plan_id(planId), 
-      settlement(&settlement), 
+      settlement(settlement),
       selectionPolicy(selectionPolicy),
-      status(PlanStatus::AVALIABLE), 
-      facilities(), 
-      underConstruction(), 
       facilityOptions(facilityOptions),
-      life_quality_score(0), 
-      economy_score(0), 
+      status(PlanStatus::AVALIABLE),
+      life_quality_score(0),
+      economy_score(0),
       environment_score(0)
-{
-    // Additional validation or logic can go here, if needed
-    if (!selectionPolicy) {
-        throw std::invalid_argument("SelectionPolicy cannot be null");
-    }
-}
+{}
+
 
 //rule of 5
 Plan::~Plan() {
@@ -30,30 +24,30 @@ Plan::~Plan() {
 
 Plan::Plan(const Plan& other): plan_id(other.plan_id), 
       settlement(other.settlement), 
-      selectionPolicy(other.selectionPolicy), 
+      selectionPolicy(other.selectionPolicy->clone()), 
       status(PlanStatus::AVALIABLE),
       facilities(), 
       underConstruction(), 
       facilityOptions(other.facilityOptions),  
       life_quality_score(0), 
       economy_score(0), 
-      environment_score(0) {};
+      environment_score(0) {
+    for (Facility* facility : other.facilities) {
+        facilities.push_back(new Facility(*facility));
+    }
+    for (Facility* facility : other.underConstruction) {
+        underConstruction.push_back(new Facility(*facility));
+      }
+    };
 
 void Plan::Clear() {
     for (Facility* facility : facilities) {
         delete facility;
     }
-    facilities.clear();
-
     for (Facility* facility : underConstruction) {
         delete facility;
     }
-    underConstruction.clear();
-
-    if (selectionPolicy) {
-        delete selectionPolicy;
-        selectionPolicy = nullptr;
-    }
+    delete selectionPolicy;
 
     // Do not delete settlement or assign nullptr
 }
@@ -116,7 +110,12 @@ Plan::Plan(Plan&& other) noexcept
       economy_score(other.economy_score),
       environment_score(other.environment_score)
 {
-    other.selectionPolicy = nullptr; // Reset dynamically allocated member
+        for (Facility* facility : other.facilities) {
+        facilities.push_back(new Facility(*facility));
+    }
+    for (Facility* facility : other.underConstruction) {
+        underConstruction.push_back(new Facility(*facility));
+      } 
 }
 
 
@@ -154,6 +153,7 @@ const int Plan::getEnvironmentScore() const {
 }
 
 void Plan::setSelectionPolicy(SelectionPolicy *_selectionPolicy) {
+    delete selectionPolicy;
     selectionPolicy= _selectionPolicy;
 }
 int getConstructionLimit(SettlementType type) {
@@ -171,10 +171,7 @@ void Plan::step() {
     // Stage 1: Check PlanStatus
     if (status == PlanStatus::AVALIABLE) {
         // Stage 2: Use the selection policy to choose new facilities
-        while (underConstruction.size() < static_cast<std::vector<Facility*>::size_type>(constructionLimit)) {
-            if (facilityOptions.empty()) {
-                break; // Prevent infinite loop if no options exist
-            }
+        while (underConstruction.size() < constructionLimit&&facilityOptions.empty()==false) {
             const FacilityType& selectedType = selectionPolicy->selectFacility(facilityOptions);
             Facility* newFacility = new Facility(selectedType, settlement.getName());
             underConstruction.push_back(newFacility);
@@ -185,7 +182,7 @@ void Plan::step() {
     decreaseConstructionTime();
 
     // Stage 4: Update PlanStatus
-    if (underConstruction.size() == static_cast<std::vector<Facility*>::size_type>(constructionLimit)) {
+    if (underConstruction.size() == constructionLimit) {
         status = PlanStatus::BUSY; // All slots are still occupied
     } else {
         status = PlanStatus::AVALIABLE; // Some slots are now free
@@ -199,6 +196,9 @@ void Plan::decreaseConstructionTime() {
         if (status == FacilityStatus::OPERATIONAL) {
             facilities.push_back(facility);
             it = underConstruction.erase(it);
+            life_quality_score += facility->getLifeQualityScore();
+            economy_score += facility->getEconomyScore();
+            environment_score += facility->getEnvironmentScore();
         } else {
             ++it;
         }
@@ -206,11 +206,14 @@ void Plan::decreaseConstructionTime() {
 }
 
 const std::string Plan::toString() const {
+    std::cout << (selectionPolicy != nullptr) << std::endl;
+    std::cout << selectionPolicy->toString() << std::endl;
+
     std::ostringstream oss;
     oss << "PlanID: " << plan_id << "\n"
         << "Settlement Name: " << settlement.toString() << "\n"
         << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << "\n"
-        << "SelectionPolicy: " << (selectionPolicy ? selectionPolicy->toString() : "N/A") << "\n"
+        << "SelectionPolicy: " << (selectionPolicy->toString()) << "\n"
         << "LifeQualityScore: " << life_quality_score << "\n"
         << "EconomyScore: " << economy_score << "\n"
         << "EnvironmentScore: " << environment_score << "\n"

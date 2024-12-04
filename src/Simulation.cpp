@@ -56,21 +56,22 @@ void Simulation::start() {
             action->act(*this);
             addAction(action);
         }
+        
     }
 }
 
-void Simulation::addPlan(const Settlement *settlement, SelectionPolicy *selectionPolicy) {
-    plans.push_back(Plan(planCounter, *settlement, selectionPolicy, facilitiesOptions));
+void Simulation::addPlan(const Settlement& settlement, SelectionPolicy *selectionPolicy) {
+    plans.push_back(Plan(planCounter, settlement, selectionPolicy, facilitiesOptions));
     planCounter++;
 }
 
 bool Simulation::addPlanHelper(vector<string>* lineargs) {
     if(lineargs->size() != 3) { return false; }
     if(!isSettlementExists(lineargs->at(1))) { return false; }
-    if(lineargs->at(2) == "nve") { addPlan(getSettlement(lineargs->at(1)), new NaiveSelection()); }
-    else if(lineargs->at(2) == "bal") { addPlan(getSettlement(lineargs->at(1)), new BalancedSelection(0,0,0)); }
-    else if(lineargs->at(2) == "eco") { addPlan(getSettlement(lineargs->at(1)), new EconomySelection()); }
-    else if(lineargs->at(2) == "env") { addPlan(getSettlement(lineargs->at(1)), new SustainabilitySelection()); }
+    if(lineargs->at(2) == "nve") { addPlan(*getSettlement(lineargs->at(1)), new NaiveSelection()); }
+    else if(lineargs->at(2) == "bal") { addPlan(*getSettlement(lineargs->at(1)), new BalancedSelection(0,0,0)); }
+    else if(lineargs->at(2) == "eco") { addPlan(*getSettlement(lineargs->at(1)), new EconomySelection()); }
+    else if(lineargs->at(2) == "env") { addPlan(*getSettlement(lineargs->at(1)), new SustainabilitySelection()); }
     else { return false; }
     return true;
 }
