@@ -208,7 +208,7 @@ void Plan::decreaseConstructionTime() {
 const std::string Plan::toString() const {
     std::ostringstream oss;
     oss << "PlanID: " << plan_id << "\n"
-         << settlement.toString() << "\n"
+        << "SettlementName: " << settlement.getName() << "\n"
         << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << "\n"
         << "SelectionPolicy: " << (selectionPolicy->toString()) << "\n"
         << "LifeQualityScore: " << life_quality_score << "\n"

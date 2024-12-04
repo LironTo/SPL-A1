@@ -18,7 +18,7 @@ class Simulation {
         Simulation &operator=(const Simulation &other);
         void start();
         void addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy);
-        bool addPlanHelper(vector<string>* lineargs);
+        bool addPlanHelper(vector<string>& lineargs);
         void addAction(BaseAction *action);
         bool addSettlement(Settlement *settlement);
         bool addFacility(FacilityType facility);

@@ -5,13 +5,9 @@
 #include "Action.h"
 using namespace std;
 
-Simulation::Simulation(const string &configFilePath) {
-    isRunning = false;
-    planCounter = 0;
-    actionsLog = std::vector<BaseAction*>();
-    plans = std::vector<Plan>();
-    settlements = std::vector<Settlement*>();
-    facilitiesOptions = std::vector<FacilityType>();
+Simulation::Simulation(const string &configFilePath) : isRunning(false), planCounter(0), actionsLog(vector<BaseAction*>()), 
+                                                        plans(vector<Plan>()), settlements(vector<Settlement*>()), 
+                                                        facilitiesOptions(vector<FacilityType>()) {
     std::fstream configFile(configFilePath);
     string line;
     while(getline(configFile, line)) {
@@ -20,13 +16,23 @@ Simulation::Simulation(const string &configFilePath) {
             addSettlement(new Settlement(lineargs[1], SettlementType(stoi(lineargs[2]))));
         } 
         else if(lineargs[0] == "facility") {
-            addFacility(FacilityType(lineargs[1], FacilityCategory(stoi(lineargs[2])), stoi(lineargs[3]), stoi(lineargs[4]), stoi(lineargs[5]), stoi(lineargs[6])));
+            addFacility(FacilityType(lineargs[1], FacilityCategory(stoi(lineargs[2])), stoi(lineargs[3]), 
+                                                                    stoi(lineargs[4]), stoi(lineargs[5]), stoi(lineargs[6])));
         }
         else if(lineargs[0] == "plan") {
-            addPlanHelper(&lineargs);
+            addPlanHelper(lineargs);
         }
     }
     configFile.close();
+    for(Settlement* settlement : settlements) {
+        cout << settlement->toString() << endl;
+    }
+    for(FacilityType facility : facilitiesOptions) {
+        cout << facility.toString() << endl;
+    }
+    for(Plan plan : plans) {
+        cout << plan.toString() << endl;
+    }
 }
 
 void Simulation::start() {
@@ -36,9 +42,7 @@ void Simulation::start() {
         string command;
         getline(cin,command);
         vector<string> lineargs = Auxiliary::parseArguments(command);
-        for (const auto& arg : lineargs) {
-            std::cout << arg << std::endl;
-}
+
         BaseAction* action = nullptr;
         if(lineargs[0] == "step") { action = new SimulateStep(stoi(lineargs[1])); }
         else if(lineargs[0] == "plan") { action = new AddPlan(lineargs[1], lineargs[2]); }
@@ -56,7 +60,6 @@ void Simulation::start() {
             action->act(*this);
             addAction(action);
         }
-        
     }
 }
 
@@ -65,13 +68,15 @@ void Simulation::addPlan(const Settlement& settlement, SelectionPolicy *selectio
     planCounter++;
 }
 
-bool Simulation::addPlanHelper(vector<string>* lineargs) {
-    if(lineargs->size() != 3) { return false; }
-    if(!isSettlementExists(lineargs->at(1))) { return false; }
-    if(lineargs->at(2) == "nve") { addPlan(*getSettlement(lineargs->at(1)), new NaiveSelection()); }
-    else if(lineargs->at(2) == "bal") { addPlan(*getSettlement(lineargs->at(1)), new BalancedSelection(0,0,0)); }
-    else if(lineargs->at(2) == "eco") { addPlan(*getSettlement(lineargs->at(1)), new EconomySelection()); }
-    else if(lineargs->at(2) == "env") { addPlan(*getSettlement(lineargs->at(1)), new SustainabilitySelection()); }
+bool Simulation::addPlanHelper(vector<string>& lineargs) {
+    if(lineargs.size() != 3) { return false; }
+    if(!isSettlementExists(lineargs.at(1))) { return false; }
+    Settlement relevant_settlement = getSettlement(lineargs.at(1));
+    string relevant_policy = lineargs.at(2);
+    if(relevant_policy == "nve") { addPlan(relevant_settlement, new NaiveSelection()); }
+    else if(relevant_policy == "bal") { addPlan(relevant_settlement, new BalancedSelection(0,0,0)); }
+    else if(relevant_policy == "eco") { addPlan(relevant_settlement, new EconomySelection()); }
+    else if(relevant_policy == "env") { addPlan(relevant_settlement, new SustainabilitySelection()); }
     else { return false; }
     return true;
 }
@@ -106,15 +111,20 @@ bool Simulation::isFacilityExists(const string &facilityName) {
     return false;
 }
 
-Settlement *Simulation::getSettlement(const string &settlementName) {
-    for(Settlement* settlement : settlements) {
-        if(settlement->getName() == settlementName) { return settlement; }
+Settlement &Simulation::getSettlement(const string &settlementName) {
+    long unsigned int index = 0;
+    for(long unsigned int i = 0; i < settlements.size(); i++){
+        if(settlements.at(i)->getName() == settlementName) { 
+            index = i; 
+            break;
+        }
     }
-    return nullptr;
+    return *(settlements.at(index));
 }
 
 Plan &Simulation::getPlan(const int planID) {
-    if(planID >= plans.size()) throw out_of_range("Plan doesn't exist");
+    int size = plans.size();
+    if(planID >= size) throw out_of_range("Plan doesn't exist");
     return plans[planID];
 }
 
@@ -129,7 +139,6 @@ void Simulation::close() {
         cout << plan.toString() << endl;
     }
     isRunning = false;
-    this->~Simulation();
 }
 
 void Simulation::open() {
@@ -151,14 +160,12 @@ Simulation::~Simulation() {
     }
 }
 
-Simulation::Simulation(const Simulation &other) : isRunning(other.isRunning), planCounter(other.planCounter) {
-    actionsLog = std::vector<BaseAction*>();
+Simulation::Simulation(const Simulation &other) : isRunning(other.isRunning), planCounter(other.planCounter), 
+                                                    actionsLog(vector<BaseAction*>()), plans(vector<Plan>()),
+                                                    settlements(vector<Settlement*>()), facilitiesOptions(vector<FacilityType>()) { 
     for(BaseAction* action: other.actionsLog) {actionsLog.push_back(action->clone());}
-    plans = std::vector<Plan>();
-    for(Plan plan: other.plans) {plans.push_back(Plan(plan));}
-    settlements = std::vector<Settlement*>();
+    for(Plan plan: other.plans) { plans.push_back(Plan(plan)); }
     for(Settlement* settlement: other.settlements) {settlements.push_back(new Settlement(*settlement));}
-    facilitiesOptions = std::vector<FacilityType>();
     for(FacilityType facility: other.facilitiesOptions) {facilitiesOptions.push_back(FacilityType(facility));}
 }
 
@@ -167,10 +174,16 @@ Simulation &Simulation::operator=(const Simulation &other){
     if(this != &other){
         isRunning = other.isRunning;
         planCounter = other.planCounter;
-        actionsLog = other.actionsLog;
-     //   plans = other.plans;
-        settlements = other.settlements;
-       // facilitiesOptions = other.facilitiesOptions;
+        for(BaseAction* action: actionsLog) {delete action;}
+        actionsLog.clear();
+        for(BaseAction* action: other.actionsLog) {actionsLog.push_back(action->clone());}
+        plans.clear();
+        for(Plan plan: other.plans) { plans.push_back(Plan(plan)); }
+        for(Settlement* settlement: settlements) {delete settlement;}
+        settlements.clear();
+        for(Settlement* settlement: other.settlements) {settlements.push_back(new Settlement(*settlement));}
+        facilitiesOptions.clear();
+        for(FacilityType facility: other.facilitiesOptions) {facilitiesOptions.push_back(FacilityType(facility));}
     }
     return *this;
 }

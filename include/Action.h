@@ -18,12 +18,13 @@ class BaseAction{
         virtual const string toString() const=0;
         virtual BaseAction* clone() const = 0;
         virtual ~BaseAction() = default;
+        BaseAction(BaseAction &&other);
 
     protected:
         void complete();
         void error(string errorMsg);
         const string &getErrorMsg() const;
-        const string &statusStr() const;
+        void statusStr(string& str) const;
 
     private:
         string errorMsg;
@@ -39,7 +40,8 @@ class SimulateStep : public BaseAction {
         const string toString() const override;
         SimulateStep *clone() const override;
         ~SimulateStep() override = default;
-        //SimulateStep &operator=(const SimulateStep &other);
+        SimulateStep(SimulateStep &&other);
+
     private:
         const int numOfSteps;
 };
@@ -52,6 +54,8 @@ class AddPlan : public BaseAction {
         const string toString() const override;
         AddPlan *clone() const override;
         ~AddPlan() override = default;
+        AddPlan(AddPlan &&other);
+        
     private:
         const string settlementName;
         const string selectionPolicy;
@@ -65,6 +69,8 @@ class AddSettlement : public BaseAction {
         void act(Simulation &simulation) override;
         AddSettlement *clone() const override;
         const string toString() const override;
+        AddSettlement(AddSettlement &&other);
+
     private:
         const string settlementName;
         const SettlementType settlementType;
@@ -79,6 +85,8 @@ class AddFacility : public BaseAction {
         void act(Simulation &simulation) override;
         AddFacility *clone() const override;
         const string toString() const override;
+        AddFacility(AddFacility &&other);
+
     private:
         const string facilityName;
         const FacilityCategory facilityCategory;
@@ -96,6 +104,8 @@ class PrintPlanStatus: public BaseAction {
         void act(Simulation &simulation) override;
         PrintPlanStatus *clone() const override;
         const string toString() const override;
+        PrintPlanStatus(PrintPlanStatus &&other);
+
     private:
         const int planId;
 };
@@ -108,6 +118,8 @@ class ChangePlanPolicy : public BaseAction {
         void act(Simulation &simulation) override;
         ChangePlanPolicy *clone() const override;
         const string toString() const override;
+        ChangePlanPolicy(ChangePlanPolicy &&other);
+
     private:
         const int planId;
         const string newPolicy;
@@ -121,6 +133,8 @@ class PrintActionsLog : public BaseAction {
         void act(Simulation &simulation) override;
         PrintActionsLog *clone() const override;
         const string toString() const override;
+        PrintActionsLog(PrintActionsLog &&other);
+
     private:
 };
 
@@ -131,6 +145,8 @@ class Close : public BaseAction {
         void act(Simulation &simulation) override;
         Close *clone() const override;
         const string toString() const override;
+        Close(Close &&other);
+
     private:
 };
 
@@ -141,6 +157,8 @@ class BackupSimulation : public BaseAction {
         void act(Simulation &simulation) override;
         BackupSimulation *clone() const override;
         const string toString() const override;
+        BackupSimulation(BackupSimulation &&other);
+
     private:
 };
 
@@ -152,5 +170,7 @@ class RestoreSimulation : public BaseAction {
         void act(Simulation &simulation) override;
         RestoreSimulation *clone() const override;
         const string toString() const override;
+        RestoreSimulation(RestoreSimulation &&other);
+
     private:
 };
