@@ -212,6 +212,17 @@ const std::string Plan::toString() const {
     std::string result = "";
     result += "PlanID: " + std::to_string(plan_id) + "\n";
     result += "SettlementName: " + settlement.getName() + "\n";
+    result += "LifeQualityScore: " + std::to_string(life_quality_score) + "\n";
+    result += "EconomyScore: " + std::to_string(economy_score) + "\n";
+    result += "EnvironmentScore: " + std::to_string(environment_score);
+    return result;
+}
+
+void Plan::printStatus() {
+    std::string result = "";
+    result += "PlanID: " + std::to_string(plan_id) + "\n";
+    result += "SettlementName: " + settlement.getName() + "\n";
+    
     if (status == PlanStatus::BUSY) {
         result += "PlanStatus: BUSY\n";
     } else {
@@ -260,10 +271,5 @@ const std::string Plan::toString() const {
             }
         }
     }
-
-    return result;
-}
-
-void Plan::printStatus() {
-    std::cout << toString();
+    std::cout << result;
 }
