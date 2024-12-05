@@ -196,7 +196,7 @@ PrintPlanStatus::PrintPlanStatus(int planId) : planId(planId) {}
 
 void PrintPlanStatus::act(Simulation &simulation) {
     try{
-        Plan plan = simulation.getPlan(planId);
+        Plan &plan = simulation.getPlan(planId);
         plan.printStatus();
     }
     catch(exception &e){
