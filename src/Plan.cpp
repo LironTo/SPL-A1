@@ -175,7 +175,7 @@ void Plan::step() {
         while (underConstruction.size() < constructionLimit&&facilityOptions.empty()==false) {
             const FacilityType& selectedType = selectionPolicy->selectFacility(facilityOptions);
             Facility* newFacility = new Facility(selectedType, settlement.getName());
-            underConstruction.push_back(newFacility);
+             underConstruction.push_back(newFacility);
         }
     }
 
@@ -222,21 +222,27 @@ const std::string Plan::toString() const {
     result += "LifeQualityScore: " + std::to_string(life_quality_score) + "\n";
     result += "EconomyScore: " + std::to_string(economy_score) + "\n";
     result += "EnvironmentScore: " + std::to_string(environment_score) + "\n";
-    result += "----- Facilities in Construction -----\n";
-
     // Check if underConstruction is not empty before iterating
-    if(!underConstruction.empty()) {
-        for (const Facility* facility : underConstruction) {
+    if(!facilities.empty()) {
+        for (const Facility* facility : facilities) {
             if (facility) {
-                result += facility->toString() + "\n";
+                result += "FacilityName:"+ facility->getName()+ "\n";
+                result += "FacilityStatus: OPERATIONAL"+ "\n";
             } else {
                 result += "null facility\n";
             }
         }
-    } else {
-        result += "No facilities under construction\n";
+    } 
+    if(!underConstruction.empty()) {
+        for (const Facility* facility : underConstruction) {
+            if (facility) {
+                result += "FacilityName:"+ facility->getName()+ "\n";
+                result += "FacilityStatus: UNDER_CONSTRUCTION"+ "\n";
+            } else {
+                result += "null facility\n";
+            }
+        }
     }
-
     return result;
 }
 
