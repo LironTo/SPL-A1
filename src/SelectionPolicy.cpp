@@ -49,26 +49,22 @@ BalancedSelection::BalancedSelection(int LifeQualityScore, int EconomyScore, int
 
 const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType> &facilitiesOptions){
     int minDistance = distance(facilitiesOptions[0]);
-    long unsigned int index = 0;
+    const FacilityType* selectedFacility = &(facilitiesOptions[0]);
     for(long unsigned int i = 0; i < facilitiesOptions.size(); i++){
         int currentDistance = distance(facilitiesOptions[i]);
         if(currentDistance < minDistance){
             minDistance = currentDistance;
+            selectedFacility = &(facilitiesOptions[i]);
         }
     }
-    for(long unsigned int i = 0; i < facilitiesOptions.size(); i++){
-        if(distance(facilitiesOptions[i]) == minDistance){
-             index = i;
-        }
-    }
-    LifeQualityScore=LifeQualityScore+facilitiesOptions[index].getLifeQualityScore();
-    EnvironmentScore=EnvironmentScore+facilitiesOptions[index].getEnvironmentScore();
-    EconomyScore=EconomyScore+facilitiesOptions[index].getEconomyScore();
-    return facilitiesOptions[index];
+    LifeQualityScore += selectedFacility->getLifeQualityScore();
+    EconomyScore += selectedFacility->getEconomyScore();
+    EnvironmentScore += selectedFacility->getEnvironmentScore();
+    return *selectedFacility;
 }
 
 const string BalancedSelection::toString() const {
-    return "blc";
+    return "bal";
 }
 
 BalancedSelection *BalancedSelection::clone() const {

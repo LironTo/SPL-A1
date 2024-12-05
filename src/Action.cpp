@@ -284,7 +284,7 @@ PrintActionsLog::PrintActionsLog(PrintActionsLog &&other) : BaseAction(other) {}
 
 /*-------------------------Close------------------------*/
 
-Close::Close() {}
+Close::Close() : BaseAction() {}
 
 void Close::act(Simulation &simulation) {
     simulation.close();
