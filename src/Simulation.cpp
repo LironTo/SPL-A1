@@ -48,8 +48,14 @@ void Simulation::start() {
         else { cout << "Invalid command" << endl; }
 
         if(action != nullptr){
+            if(lineargs[0] == "backup"){
+                addAction(action);
             action->act(*this);
-            addAction(action);
+            }
+            else{
+                action->act(*this);
+                addAction(action);
+            }
         }
     }
 }
@@ -139,6 +145,7 @@ void Simulation::open() {
 }
 
 void Simulation::printActionsLog() {
+    cout << "actionsLog size: " << actionsLog.size() << endl;
     for(BaseAction* action : actionsLog) {
         cout << action->toString() << endl;
     }
