@@ -207,11 +207,11 @@ void Plan::decreaseConstructionTime() {
 }
 
 const std::string Plan::toString() const {
-    string result = "";
+    std::string result = "";
     result += "PlanID: " + std::to_string(plan_id) + "\n";
     result += "SettlementName: " + settlement.getName() + "\n";
     result += "PlanStatus: " + std::string(status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") + "\n";
-    
+
     // Check if selectionPolicy is not null before dereferencing
     if (selectionPolicy) {
         result += "SelectionPolicy: " + selectionPolicy->toString() + "\n";
@@ -222,27 +222,39 @@ const std::string Plan::toString() const {
     result += "LifeQualityScore: " + std::to_string(life_quality_score) + "\n";
     result += "EconomyScore: " + std::to_string(economy_score) + "\n";
     result += "EnvironmentScore: " + std::to_string(environment_score) + "\n";
-    // Check if underConstruction is not empty before iterating
-    if(!facilities.empty()) {
+
+    // Iterate over facilities
+    if (!facilities.empty()) {
         for (const Facility* facility : facilities) {
             if (facility) {
-                result += "FacilityName:"+ facility->getName()+ "\n";
-                result += "FacilityStatus: OPERATIONAL"+ "\n";
-            } else {
-                result += "null facility\n";
-            }
-        }
-    } 
-    if(!underConstruction.empty()) {
-        for (const Facility* facility : underConstruction) {
-            if (facility) {
-                result += "FacilityName:"+ facility->getName()+ "\n";
-                result += "FacilityStatus: UNDER_CONSTRUCTION"+ "\n";
+                result += "FacilityName: " + facility->getName() + "\n";
+                if (facility->getStatus() == FacilityStatus::UNDER_CONSTRUCTIONS) {
+                    result += "FacilityStatus: UNDER_CONSTRUCTION\n";
+                } else {
+                    result += "FacilityStatus: OPERATIONAL\n";
+                }
             } else {
                 result += "null facility\n";
             }
         }
     }
+
+    // Iterate over underConstruction
+    if (!underConstruction.empty()) {
+        for (const Facility* facility : underConstruction) {
+            if (facility) {
+                result += "FacilityName: " + facility->getName() + "\n";
+                if (facility->getStatus() == FacilityStatus::UNDER_CONSTRUCTIONS) {
+                    result += "FacilityStatus: UNDER_CONSTRUCTION\n";
+                } else {
+                    result += "FacilityStatus: OPERATIONAL\n";
+                }
+            } else {
+                result += "null facility\n";
+            }
+        }
+    }
+
     return result;
 }
 
