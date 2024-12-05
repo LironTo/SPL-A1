@@ -18,7 +18,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 }
 
 const string NaiveSelection::toString() const {
-    return "Naive, last selected index: " + std::to_string(lastSelectedIndex);
+    return "nve ";
 }
 
 NaiveSelection *NaiveSelection::clone() const {
@@ -61,11 +61,14 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
              index = i;
         }
     }
+    LifeQualityScore=LifeQualityScore+facilitiesOptions[index].getLifeQualityScore();
+    EnvironmentScore=EnvironmentScore+facilitiesOptions[index].getEnvironmentScore();
+    EconomyScore=EconomyScore+facilitiesOptions[index].getEconomyScore();
     return facilitiesOptions[index];
 }
 
 const string BalancedSelection::toString() const {
-    return "Balanced, LifeQualityScore: " + std::to_string(LifeQualityScore) + ", EconomyScore: " + std::to_string(EconomyScore) + ", EnvironmentScore: " + std::to_string(EnvironmentScore);
+    return "blc";
 }
 
 BalancedSelection *BalancedSelection::clone() const {
@@ -136,9 +139,8 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
 }
 
 const string EconomySelection::toString() const {
-    return "Economy, last selected index: " + std::to_string(lastSelectedIndex);
+    return "eco";
 }
-
 EconomySelection *EconomySelection::clone() const {
     return new EconomySelection(*this);
 }
@@ -179,7 +181,7 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
 }
 
 const string SustainabilitySelection::toString() const {
-    return "Sustainability, last selected index: " + std::to_string(lastSelectedIndex);
+    return "env";
 }
 
 SustainabilitySelection *SustainabilitySelection::clone() const {

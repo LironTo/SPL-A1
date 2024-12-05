@@ -7,10 +7,12 @@ Plan::Plan(int planId,
            SelectionPolicy* selectionPolicy, 
            const std::vector<FacilityType>& facilityOptions)
     : plan_id(planId),
-      selectionPolicy(selectionPolicy),
-      facilityOptions(facilityOptions),
-      settlement(settlement),
+     settlement(settlement),
+     selectionPolicy(selectionPolicy),
       status(PlanStatus::AVALIABLE),
+      facilities(),
+      underConstruction(),
+      facilityOptions(facilityOptions),
       life_quality_score(0),
       economy_score(0),
       environment_score(0)
@@ -210,7 +212,11 @@ const std::string Plan::toString() const {
     std::string result = "";
     result += "PlanID: " + std::to_string(plan_id) + "\n";
     result += "SettlementName: " + settlement.getName() + "\n";
-    result += "PlanStatus: " + std::string(status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") + "\n";
+    if (status == PlanStatus::BUSY) {
+        result += "PlanStatus: BUSY\n";
+    } else {
+        result += "PlanStatus: AVAILABLE\n";
+    }
 
     // Check if selectionPolicy is not null before dereferencing
     if (selectionPolicy) {
