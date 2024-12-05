@@ -340,8 +340,8 @@ void RestoreSimulation::act(Simulation &simulation) {
         error("No backup available");
         return;
     }
-    simulation = *backup;
     complete();
+    simulation = *backup;
 }
 
 RestoreSimulation *RestoreSimulation::clone() const {

@@ -24,15 +24,6 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
         }
     }
     configFile.close();
-    for(Settlement* settlement : settlements) {
-        cout << settlement->toString() << endl;
-    }
-    for(FacilityType facility : facilitiesOptions) {
-        cout << facility.toString() << endl;
-    }
-    for(Plan plan : plans) {
-        cout << plan.toString() << endl;
-    }
 }
 
 void Simulation::start() {
@@ -57,8 +48,14 @@ void Simulation::start() {
         else { cout << "Invalid command" << endl; }
 
         if(action != nullptr){
+            if(lineargs[0] == "backup"){
+                addAction(action);
             action->act(*this);
-            addAction(action);
+            }
+            else{
+                action->act(*this);
+                addAction(action);
+            }
         }
     }
 }
@@ -71,7 +68,7 @@ void Simulation::addPlan(const Settlement& settlement, SelectionPolicy *selectio
 bool Simulation::addPlanHelper(vector<string>& lineargs) {
     if(lineargs.size() != 3) { return false; }
     if(!isSettlementExists(lineargs.at(1))) { return false; }
-    Settlement relevant_settlement = getSettlement(lineargs.at(1));
+    Settlement &relevant_settlement = getSettlement(lineargs.at(1));
     string relevant_policy = lineargs.at(2);
     if(relevant_policy == "nve") { addPlan(relevant_settlement, new NaiveSelection()); }
     else if(relevant_policy == "bal") { addPlan(relevant_settlement, new BalancedSelection(0,0,0)); }
@@ -99,7 +96,9 @@ bool Simulation::addFacility(FacilityType facility) {
 
 bool Simulation::isSettlementExists(const string &settlementName) {
     for(Settlement* settlement : settlements) {
-        if(settlement->getName() == settlementName) { return true; }
+        if(settlement->getName() == settlementName) { 
+            return true; 
+        }
     }
     return false;
 }
@@ -146,6 +145,7 @@ void Simulation::open() {
 }
 
 void Simulation::printActionsLog() {
+    cout << "actionsLog size: " << actionsLog.size() << endl;
     for(BaseAction* action : actionsLog) {
         cout << action->toString() << endl;
     }

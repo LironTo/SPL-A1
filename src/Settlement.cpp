@@ -1,7 +1,9 @@
 #include "../include/Settlement.h"
 #include <iostream>
 
-Settlement::Settlement(const string &name, SettlementType type): name(name), type(type){};
+Settlement::Settlement(const string &name, SettlementType type): name(name), type(type){
+
+};
 const string& Settlement::getName() const {
     return name; 
 }
@@ -26,6 +28,4 @@ const string Settlement::toString() const {
     return "Settlement Name: " + name + ", Type: " + settlementTypeStr;
 }
 
-
-
-
+Settlement::Settlement(const Settlement &other): name(other.name), type(other.type) {}    

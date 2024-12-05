@@ -6,15 +6,16 @@ Plan::Plan(int planId,
            const Settlement &settlement,
            SelectionPolicy* selectionPolicy, 
            const std::vector<FacilityType>& facilityOptions)
-    : plan_id(planId), 
-      settlement(settlement),
+    : plan_id(planId),
       selectionPolicy(selectionPolicy),
       facilityOptions(facilityOptions),
+      settlement(settlement),
       status(PlanStatus::AVALIABLE),
       life_quality_score(0),
       economy_score(0),
       environment_score(0)
 {}
+
 
 
 //rule of 5
@@ -206,11 +207,11 @@ void Plan::decreaseConstructionTime() {
 }
 
 const std::string Plan::toString() const {
-    std::string result;
+    string result = "";
     result += "PlanID: " + std::to_string(plan_id) + "\n";
     result += "SettlementName: " + settlement.getName() + "\n";
     result += "PlanStatus: " + std::string(status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") + "\n";
-
+    
     // Check if selectionPolicy is not null before dereferencing
     if (selectionPolicy) {
         result += "SelectionPolicy: " + selectionPolicy->toString() + "\n";
