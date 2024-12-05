@@ -20,10 +20,10 @@ int FacilityType::getLifeQualityScore() const {
     return lifeQuality_score;
 }
 int FacilityType::getEnvironmentScore() const {
-    return economy_score;
+    return environment_score;
 }
 int FacilityType::getEconomyScore() const {
-    return environment_score;
+    return economy_score;
 }
 FacilityCategory FacilityType::getCategory() const {
     return category;
