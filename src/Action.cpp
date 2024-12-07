@@ -5,7 +5,7 @@ extern Simulation* backup;
 
 /*-------------------------BaseAction------------------------*/
 
-BaseAction::BaseAction(): errorMsg(""),  status(ActionStatus::ERROR){}
+BaseAction::BaseAction(): errorMsg("1"),  status(ActionStatus::ERROR){}
 
 BaseAction::BaseAction(const BaseAction &other) : errorMsg(other.errorMsg),  status(other.status){}
 
@@ -313,8 +313,8 @@ void BackupSimulation::act(Simulation &simulation) {
     if(backup!=nullptr){
         delete backup;
     }
-    backup = new Simulation(simulation);
     complete();
+    backup = new Simulation(simulation);
 }
 
 BackupSimulation *BackupSimulation::clone() const {
