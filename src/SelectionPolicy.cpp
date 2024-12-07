@@ -48,13 +48,13 @@ NaiveSelection &NaiveSelection::operator=(NaiveSelection &&other) {
 BalancedSelection::BalancedSelection(int LifeQualityScore, int EconomyScore, int EnvironmentScore) : SelectionPolicy(), LifeQualityScore(LifeQualityScore), EconomyScore(EconomyScore), EnvironmentScore(EnvironmentScore) {}
 
 const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType> &facilitiesOptions){
-    int minDistance = distance(facilitiesOptions[0]);
-    const FacilityType* selectedFacility = &(facilitiesOptions[0]);
+    int minDistance = distance(facilitiesOptions.at(0));
+    const FacilityType* selectedFacility = &(facilitiesOptions.at(0));
     for(long unsigned int i = 0; i < facilitiesOptions.size(); i++){
-        int currentDistance = distance(facilitiesOptions[i]);
+        int currentDistance = distance(facilitiesOptions.at(i));
         if(currentDistance < minDistance){
             minDistance = currentDistance;
-            selectedFacility = &(facilitiesOptions[i]);
+            selectedFacility = &(facilitiesOptions.at(i));
         }
     }
     LifeQualityScore += selectedFacility->getLifeQualityScore();

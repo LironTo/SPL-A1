@@ -50,6 +50,10 @@ const string FacilityType::toString() const {
     return s;
 }
 
+FacilityType::FacilityType(const FacilityType &other): name(other.name), category(other.category), price(other.price),
+lifeQuality_score(other.lifeQuality_score), economy_score(other.economy_score),
+ environment_score(other.environment_score) {}
+
 /*------------------------------Facility----------------------------*/
 
 Facility::Facility(const FacilityType &type, const string &settlementName)
@@ -106,7 +110,8 @@ const string Facility::toString() const {
     return s;
 }
 
-
+Facility::Facility(const Facility &other): FacilityType(other), settlementName(other.settlementName), 
+status(other.status), timeLeft(other.timeLeft) {}
 
 
 

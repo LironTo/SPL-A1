@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/Plan.h"
 #include <sstream>
+#include "Simulation.h"
 
 Plan::Plan(int planId, 
            const Settlement &settlement,
@@ -25,23 +26,24 @@ Plan::~Plan() {
     Clear();
 }
 
-Plan::Plan(const Plan& other): plan_id(other.plan_id), 
-      settlement(other.settlement), 
-      selectionPolicy(other.selectionPolicy->clone()), 
-      status(PlanStatus::AVALIABLE),
-      facilities(), 
-      underConstruction(), 
-      facilityOptions(other.facilityOptions),  
-      life_quality_score(0), 
-      economy_score(0), 
-      environment_score(0) {
+Plan::Plan(const Plan& other,const Simulation& simulation)
+    : plan_id(other.plan_id),
+      settlement(simulation.getSettlementC(other.settlement.getName())),
+      selectionPolicy(other.selectionPolicy->clone()),
+      status(other.status),
+      facilities(),
+      underConstruction(),
+      facilityOptions(simulation.getFacilityOptions()),
+      life_quality_score(other.life_quality_score),
+      economy_score(other.economy_score),
+      environment_score(other.environment_score) {
     for (Facility* facility : other.facilities) {
         facilities.push_back(new Facility(*facility));
     }
     for (Facility* facility : other.underConstruction) {
         underConstruction.push_back(new Facility(*facility));
-      }
-    };
+    }
+}
 
 void Plan::Clear() {
     for (Facility* facility : facilities) {
@@ -54,52 +56,6 @@ void Plan::Clear() {
 
     // Do not delete settlement or assign nullptr
 }
-
-// Plan& Plan::operator=(const Plan& other) noexcept {
-//     // Self-assignment check
-//     if (this == &other) {
-//         return *this;
-//     }
-//     Clear();
-//     plan_id = other.plan_id;
-//     status = other.status;
-//     life_quality_score = other.life_quality_score;
-//     economy_score = other.economy_score;
-//     environment_score = other.environment_score;
-
-//     // Deep copy facilities
-//     for (Facility* facility : other.facilities) {
-//         facilities.push_back(new Facility(*facility));
-//     }
-//     for (Facility* facility : other.underConstruction) {
-//         underConstruction.push_back(new Facility(*facility));
-//     }
-
-//     // Deep copy selection policy
-//     if (other.selectionPolicy) {
-//         selectionPolicy = other.selectionPolicy->clone();
-//     } else {
-//         selectionPolicy = nullptr;
-//     }
-
-//     // Copy settlement (shallow copy or deep copy based on ownership)
-//     settlement = other.settlement;
-
-//     return *this; // Return the updated object
-// }
-
-// Plan::Plan()
-//     : plan_id(0),
-//       settlement(nullptr),
-//       selectionPolicy(nullptr), 
-//       status(PlanStatus::AVALIABLE),
-//       facilities(), 
-//       underConstruction(), 
-//       facilityOptions( const vector<FacilityType>()), 
-//       life_quality_score(0),
-//       economy_score(0),
-//       environment_score(0) {
-// }
 
 Plan::Plan(Plan&& other) noexcept
     : plan_id(other.plan_id),
@@ -120,29 +76,6 @@ Plan::Plan(Plan&& other) noexcept
         underConstruction.push_back(new Facility(*facility));
       } 
 }
-
-
-
-// Plan& Plan::operator=(Plan&& other) noexcept {
-//     if (this != &other) {
-//         Clear(); // Clean up current object's resources
-//         facilities = std::move(other.facilities);
-//         underConstruction = std::move(other.underConstruction);
-//         //facilityOptions = other.facilityOptions; 
-//         plan_id = other.plan_id;
-//         selectionPolicy = other.selectionPolicy;
-//         settlement = other.settlement;
-//         status = other.status;
-//         life_quality_score = other.life_quality_score;
-//         economy_score = other.economy_score;
-//         environment_score = other.environment_score;
-//     }
-//     return *this;
-// }
-
-
-
-
 
 const int Plan::getlifeQualityScore() const {
     return life_quality_score;
