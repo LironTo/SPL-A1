@@ -3,7 +3,7 @@
 
 all: clean Link Run Leaks
 
-compile: bin/Action.o bin/Auxiliary.o bin/Facility.o bin/Plan.o bin/SelectionPolicy.o bin/Settlement.o bin/Simulation.o bin/main.o
+compile: bin/Auxiliary.o bin/Simulation.o bin/Facility.o bin/Settlement.o bin/SelectionPolicy.o bin/Plan.o bin/Action.o bin/main.o
 
 bin/Auxiliary.o: src/Auxiliary.cpp
 	g++ -g -c -Wall -Weffc++ -std=c++11 -Iinclude -o bin/Auxiliary.o src/Auxiliary.cpp

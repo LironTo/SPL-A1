@@ -3,7 +3,10 @@
 #include "Facility.h"
 #include "Settlement.h"
 #include "SelectionPolicy.h"
+
 using std::vector;
+
+class Simulation;
 
 enum class PlanStatus {
     AVALIABLE,
@@ -12,12 +15,9 @@ enum class PlanStatus {
 
 class Plan {
     public:
-        Plan(const int planId, const Settlement& settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
-        Plan(const Plan& plan);
-        Plan& operator=(const Plan&) = delete; 
-        Plan& operator=(Plan&&) = delete;      
+        Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
+        Plan(const Plan& other,const Simulation& simulation);    
         Plan(Plan&& other) noexcept;
-        Plan();
         void Clear();
         const int getlifeQualityScore() const;
         const int getEconomyScore() const;
@@ -34,7 +34,7 @@ class Plan {
 private:
         int plan_id;
         const Settlement &settlement;
-        SelectionPolicy *selectionPolicy; //What happens if we change this to a reference?
+        SelectionPolicy *selectionPolicy;
         PlanStatus status;
         vector<Facility*> facilities;
         vector<Facility*> underConstruction;
