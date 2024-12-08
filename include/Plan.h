@@ -17,7 +17,7 @@ class Plan {
     public:
         Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
         Plan(const Plan& other,const Simulation& simulation);    
-        Plan(Plan&& other) noexcept;
+        Plan(Plan&& other);
         void Clear();
         const int getlifeQualityScore() const;
         const int getEconomyScore() const;
@@ -30,6 +30,9 @@ class Plan {
         const vector<Facility*> &getFacilities() const;
         void addFacility(Facility* facility);
         const string toString() const;
+        Plan &operator=(const Plan &other) = delete;
+        Plan &operator=(Plan &&other) = delete;
+        Plan(const Plan &other) = delete;
 
 private:
         int plan_id;

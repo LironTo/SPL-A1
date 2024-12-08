@@ -1,9 +1,4 @@
 #include "Simulation.h"
-#include "Auxiliary.h"
-#include <iostream>
-#include <fstream>
-#include "Action.h"
-using namespace std;
 
 Simulation::Simulation(const string &configFilePath) : isRunning(false), planCounter(0), actionsLog(vector<BaseAction*>()), 
                                                         plans(vector<Plan>()), settlements(vector<Settlement*>()), 
@@ -11,6 +6,8 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
     std::fstream configFile(configFilePath);
     string line;
     while(getline(configFile, line)) {
+        if(line.empty()) { continue; }
+        if(line.at(0) == '#') { continue; }
         vector<string> lineargs = Auxiliary::parseArguments(line);
         if(lineargs[0] == "settlement") {
             addSettlement(new Settlement(lineargs[1], SettlementType(stoi(lineargs[2]))));
@@ -47,14 +44,8 @@ void Simulation::start() {
         else { cout << "Invalid command" << endl; }
 
         if(action != nullptr){
-            if(lineargs.at(0) == "backup"){
-                addAction(action);
             action->act(*this);
-            }
-            else{
-                action->act(*this);
-                addAction(action);
-            }
+            addAction(action);
         }
     }
 }
@@ -132,8 +123,7 @@ Settlement &Simulation::getSettlementC(const string &settlementName) const {
 }
 
 Plan &Simulation::getPlan(const int planID) {
-    int size = plans.size();
-    if(planID >= size) throw out_of_range("Plan doesn't exist");
+    if((long unsigned int)planID >= plans.size()) throw out_of_range("Plan doesn't exist");
     return plans[planID];
 }
 
@@ -212,4 +202,61 @@ Simulation &Simulation::operator=(const Simulation &other){
 
 const vector<FacilityType> &Simulation::getFacilityOptions() const {
     return facilitiesOptions;
+}
+
+Simulation::Simulation(Simulation &&other) 
+    : isRunning(other.isRunning), 
+      planCounter(other.planCounter),
+        actionsLog(),
+        plans(),
+        settlements(),
+        facilitiesOptions() {
+            for(BaseAction* action: actionsLog) {delete action;}
+            actionsLog.clear();
+            plans.clear();
+            for(Settlement* settlement: settlements) {delete settlement;}
+            settlements.clear();
+            facilitiesOptions.clear();
+            for(const Settlement* settlement: other.settlements) {
+                settlements.push_back(new Settlement(*settlement)); 
+                delete settlement;
+            }
+            for(const FacilityType& facility: other.facilitiesOptions) {facilitiesOptions.push_back(FacilityType(facility));}
+            for(const Plan& plan: other.plans) {plans.push_back(Plan(plan, *this));}
+            for(const BaseAction* action: other.actionsLog) {
+                actionsLog.push_back(action->clone());
+                delete action;
+            }
+            other.actionsLog.clear();
+            other.plans.clear();
+            other.settlements.clear();
+            other.facilitiesOptions.clear();
+}
+
+Simulation &Simulation::operator=(Simulation &&other) {
+    if(this != &other){
+        isRunning = other.isRunning;
+        planCounter = other.planCounter;
+        for(BaseAction* action: actionsLog) {delete action;}
+        actionsLog.clear();
+        plans.clear();
+        for(Settlement* settlement: settlements) {delete settlement;}
+        settlements.clear();
+        facilitiesOptions.clear();
+        for(const Settlement* settlement: other.settlements) {
+            settlements.push_back(new Settlement(*settlement)); 
+            delete settlement;
+        }
+        for(const FacilityType& facility: other.facilitiesOptions) {facilitiesOptions.push_back(FacilityType(facility));}
+        for(const Plan& plan: other.plans) {plans.push_back(Plan(plan, *this));}
+        for(const BaseAction* action: other.actionsLog) {
+            actionsLog.push_back(action->clone());
+             delete action;
+        }
+        other.actionsLog.clear();
+        other.plans.clear();
+        other.settlements.clear();
+        other.facilitiesOptions.clear();
+    }
+    return *this;
 }

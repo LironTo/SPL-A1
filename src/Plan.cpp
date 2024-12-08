@@ -57,7 +57,7 @@ void Plan::Clear() {
     // Do not delete settlement or assign nullptr
 }
 
-Plan::Plan(Plan&& other) noexcept
+Plan::Plan(Plan&& other)
     : plan_id(other.plan_id),
       settlement(other.settlement), // Keep reference intact
       selectionPolicy(other.selectionPolicy->clone()), // Deep copy 
@@ -102,7 +102,10 @@ void Plan::setSelectionPolicy(SelectionPolicy *_selectionPolicy) {
     else if(after == "env"){ after = "Sustainability";}
     else if(after == "eco"){ after = "Economy";}
     
-    if(before == after){ throw std::runtime_error("Same selection policy"); }
+    if(before == after){ 
+        delete _selectionPolicy;
+        throw std::runtime_error("Same selection policy"); 
+    }
 
     std::cout << "planID: " << plan_id << std::endl;
     std::cout << "previousPolicy: " << before << std::endl;
@@ -111,6 +114,7 @@ void Plan::setSelectionPolicy(SelectionPolicy *_selectionPolicy) {
     delete selectionPolicy;
     selectionPolicy= _selectionPolicy;
 }
+
 int getConstructionLimit(SettlementType type) {
     switch (type) {
         case SettlementType::VILLAGE: return 1;
@@ -121,7 +125,7 @@ int getConstructionLimit(SettlementType type) {
 }
 void Plan::step() {
     // Calculate the construction limit once
-    int constructionLimit = getConstructionLimit(settlement.getType());
+    long unsigned int constructionLimit = getConstructionLimit(settlement.getType());
 
     // Stage 1: Check PlanStatus
     if (status == PlanStatus::AVALIABLE) {
