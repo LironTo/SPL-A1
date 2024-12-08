@@ -228,11 +228,12 @@ void ChangePlanPolicy::act(Simulation &simulation) {
     try{
         Plan &plan = simulation.getPlan(planId);
         SelectionPolicy *selectionPolicy = nullptr;
-        if(newPolicy == "nve") { selectionPolicy = new NaiveSelection(); }
-        else if(newPolicy == "bal") { selectionPolicy = new BalancedSelection(plan.getlifeQualityScore(),plan.getEconomyScore(),plan.getEnvironmentScore()); }
-        else if(newPolicy == "eco") { selectionPolicy = new EconomySelection(); }
-        else if(newPolicy == "env") { selectionPolicy = new SustainabilitySelection(); }
+        if(newPolicy == "nve") { delete selectionPolicy; selectionPolicy = new NaiveSelection(); }
+        else if(newPolicy == "bal") { delete selectionPolicy; selectionPolicy = new BalancedSelection(plan.getlifeQualityScore(),plan.getEconomyScore(),plan.getEnvironmentScore()); }
+        else if(newPolicy == "eco") { delete selectionPolicy; selectionPolicy = new EconomySelection(); }
+        else if(newPolicy == "env") { delete selectionPolicy; selectionPolicy = new SustainabilitySelection(); }
         else{
+            delete selectionPolicy;
             error("Cannot change selection policy");
             return;
         }
@@ -313,8 +314,8 @@ void BackupSimulation::act(Simulation &simulation) {
     if(backup!=nullptr){
         delete backup;
     }
-    complete();
     backup = new Simulation(simulation);
+    complete();
 }
 
 BackupSimulation *BackupSimulation::clone() const {
