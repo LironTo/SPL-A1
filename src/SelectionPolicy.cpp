@@ -18,7 +18,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 }
 
 const string NaiveSelection::toString() const {
-    return "nve ";
+    return "nve";
 }
 
 NaiveSelection *NaiveSelection::clone() const {

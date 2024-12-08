@@ -1,7 +1,7 @@
 # Please implement your Makefile rules and targets below.
 # Customize this file to define how to build your project.
 
-all: clean Link Run Leaks
+all: clean Link
 
 compile: bin/Auxiliary.o bin/Simulation.o bin/Facility.o bin/Settlement.o bin/SelectionPolicy.o bin/Plan.o bin/Action.o bin/main.o
 

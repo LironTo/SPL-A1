@@ -89,6 +89,25 @@ const int Plan::getEnvironmentScore() const {
 }
 
 void Plan::setSelectionPolicy(SelectionPolicy *_selectionPolicy) {
+    string before = selectionPolicy->toString();
+    if(before == "nve") { before = "Naive";}
+    else if(before == "bal"){ before = "Balanced";}
+    else if(before == "env"){ before = "Sustainability";}
+    else if(before == "eco"){ before = "Economy";}
+    
+
+    string after = _selectionPolicy->toString();
+    if(after == "nve") { after = "Naive";}
+    else if(after == "bal"){ after = "Balanced";}
+    else if(after == "env"){ after = "Sustainability";}
+    else if(after == "eco"){ after = "Economy";}
+    
+    if(before == after){ throw std::runtime_error("Same selection policy"); }
+
+    std::cout << "planID: " << plan_id << std::endl;
+    std::cout << "previousPolicy: " << before << std::endl;
+    std::cout << "newPolicy: " << after << std::endl;
+
     delete selectionPolicy;
     selectionPolicy= _selectionPolicy;
 }
